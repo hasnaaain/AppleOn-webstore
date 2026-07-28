@@ -7,6 +7,8 @@ import {
   HiOutlineMenu,
   HiX,
   HiChevronDown,
+  HiOutlineMoon,
+  HiOutlineSun,
 } from 'react-icons/hi';
 import { HiOutlineShoppingBag } from 'react-icons/hi2';
 import { TbArrowsExchange } from 'react-icons/tb';
@@ -32,6 +34,12 @@ export default function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    const saved = window.localStorage.getItem('appleon-theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
@@ -49,6 +57,12 @@ export default function Header() {
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem('appleon-theme', theme);
+  }, [theme]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -122,6 +136,15 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-1 sm:gap-2">
+          <button
+            onClick={() => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))}
+            className="w-10 h-10 flex items-center justify-center text-lg text-primary-dark hover:text-accent-dark transition-colors"
+            aria-label="Toggle theme"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <HiOutlineSun /> : <HiOutlineMoon />}
+          </button>
+
           <button
             onClick={() => setSearchOpen((v) => !v)}
             className="w-10 h-10 flex items-center justify-center text-lg text-primary-dark hover:text-accent-dark transition-colors"
